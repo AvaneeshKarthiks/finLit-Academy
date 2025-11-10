@@ -77,12 +77,12 @@
 //                 <div className="prose max-w-none mt-4" dangerouslySetInnerHTML={{ __html: content.content }} />
 //               </div>
 //             )}
-//             {/* {contentType === 'blog' && (
-//               <div>
-//                 {content.thumbnail_url && <img src={content.thumbnail_url} alt={content.imageAlt || content.title} className="w-full h-auto object-cover rounded-md mb-4" />}
-//                 <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content.content }} />
-//               </div>
-//             )} */}
+            // {{contentType === 'blog' && (
+            //   <div>
+            //     {content.thumbnail_url && <img src={content.thumbnail_url} alt={content.imageAlt || content.title} className="w-full h-auto object-cover rounded-md mb-4" />}
+            //     <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content.content }} />
+            //   </div>
+            // )}}
 //           </CardContent>
 //         </Card>
 //       </div>
@@ -130,8 +130,11 @@ export default function ContentPreviewPage() {
       try {
         const response = await fetch(`http://127.0.0.1:5000/employee/${contentType}/${id}`)
         const data = await response.json()
+      
+        console.log("data", data)
         if (response.ok) {
           setContent(data)
+          console.log(content)
         } else {
           setError(data.error || "Failed to fetch content")
         }
@@ -193,18 +196,18 @@ export default function ContentPreviewPage() {
                 />
               </div>
             )}
-
+            
             {contentType === "blog" && (
               <div>
                 {content.thumbnail && (
                   <img
                     src={content.thumbnail}
-                    alt={content.imageAlt || content.title}
+                    alt={content.thumbnail || content.title}
                     className="w-full h-auto object-cover rounded-md mb-4"
                   />
                 )}
                 <div
-                  className="prose max-w-none"
+                  className="prose max-w-none mt-4 whitespace-pre-line"
                   dangerouslySetInnerHTML={{ __html: content.content }}
                 />
               </div>

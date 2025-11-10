@@ -442,3 +442,37 @@ def get_course_by_id(course_id):
     finally:
         if conn.is_connected():
             conn.close()
+
+
+@auth_bp.route("/employee/blog/<int:id>", methods=["GET"])
+def get_blog(id):
+    """Fetch a single blog by ID"""
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+        cur.execute("""
+            SELECT 
+                b.id, b.title, b.content, b.image_url, b.image_alt, 
+                b.created_at, v.name AS author_name
+            FROM blogs b
+            LEFT JOIN volunteers v ON b.author_id = v.id
+            WHERE b.id = %s
+        """, (id,))
+        blog = cur.fetchone()
+        if not blog:
+            return jsonify({"error": "Blog not found"}), 404
+
+        return jsonify({
+            "id": blog["id"],
+            "title": blog["title"],
+            "content": blog["content"],
+            "thumbnail": blog["image_url"],
+            "imageAlt": blog["image_alt"],
+            "author": blog["author_name"] or "Unknown",
+            "createdAt": blog["created_at"].isoformat() if blog["created_at"] else None
+        }), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch blog", "details": str(e)}), 500
+    finally:
+        cur.close()
+        conn.close()
