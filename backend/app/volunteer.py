@@ -37,8 +37,7 @@ def register_volunteer():
     try:
         cur = conn.cursor()
         try:
-            # Insert volunteer
-            # Store hashed password to match login check
+            
             hashed_pw = _sha256_hex(password)
             insert_vol_sql = """
                 INSERT INTO volunteers (email, password, name, phone)
@@ -54,8 +53,7 @@ def register_volunteer():
             """
             cur.execute(insert_app_sql, (volunteer_id, None, "pending", initial_comment))
 
-            # If autocommit is off, uncomment the next line
-            # conn.commit()
+            
 
             return jsonify({
                 "message": "registered (pending approval)",
@@ -64,7 +62,7 @@ def register_volunteer():
             }), 201
 
         except Error as e:
-            # Duplicate email error code for MySQL is 1062
+            
             if getattr(e, "errno", None) == 1062:
                 return jsonify({"error": "email already exists"}), 409
             return jsonify({"error": str(e)}), 500
@@ -109,17 +107,15 @@ def volunteer_login():
             if not volunteer:
                 return jsonify({"error": "invalid credentials"}), 401
 
-            # Check password (you may want to use proper password hashing comparison)
+            
             if volunteer["password"] != _sha256_hex(password):
                 return jsonify({"error": "invalid credentials"}), 401
 
-            # Check if volunteer is approved
+            
             if not volunteer["is_approved"]:
                 return jsonify({"error": "account not approved yet"}), 403
             
-            # print(volunteer) ;
-
-            # Store volunteer ID in session
+            
             session["volunteer_id"] = volunteer["id"]
             session["volunteer_name"] = volunteer["name"]
             session["volunteer_role"] = "volunteer"
@@ -164,7 +160,7 @@ def volunteer_dashboard():
     try:
         conn = get_db_connection()
         cur = conn.cursor(dictionary=True, buffered=True)
-        # ✅ Fetch volunteer’s course and article stats
+        
         cur.execute("SELECT * FROM courses WHERE author_id = %s", (volunteer_id,))
         courses = cur.fetchall()
 
